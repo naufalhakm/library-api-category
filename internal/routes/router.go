@@ -2,17 +2,16 @@ package routes
 
 import (
 	"fmt"
-	"library-api-category/internal/commons/response"
 	"library-api-category/internal/factory"
-	"library-api-category/pkg/token"
+	"library-api-category/internal/grpc/client"
+	"library-api-category/internal/middleware"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(provider *factory.Provider) *gin.Engine {
+func RegisterRoutes(provider *factory.Provider, authClient *client.AuthClient) *gin.Engine {
 	router := gin.New()
 
 	router.Use(gin.Logger(), CORS())
@@ -28,16 +27,16 @@ func RegisterRoutes(provider *factory.Provider) *gin.Engine {
 	{
 		v1 := api.Group("v1")
 		{
-			auth := v1.Group("/categories", CheckAuth())
-			{
-				auth.GET("/", provider.CategoryProvider.GetAllCategories)
-				auth.POST("/", provider.CategoryProvider.CreateCategory)
-				auth.GET("/:id", provider.CategoryProvider.GetDetailCategory)
-				auth.PUT("/:id", provider.CategoryProvider.UpdateCategory)
-				auth.DELETE("/:id", provider.CategoryProvider.DeleteCategory)
-				auth.POST("/books", provider.CategoryProvider.AddBookCategory)
-				auth.GET("/books/:id", provider.CategoryProvider.ListCategoryOfBook)
-			}
+			auth := v1.Use(middleware.CheckAuth(authClient))
+			auth.GET("/categories", provider.CategoryProvider.GetAllCategories)
+			auth.GET("/categories/:id", provider.CategoryProvider.GetDetailCategory)
+			auth.GET("/books/:id", provider.CategoryProvider.ListCategoryOfBook)
+
+			admin := v1.Use(middleware.CheckAuthIsAdminOrAuthor(authClient))
+			admin.POST("/categories", provider.CategoryProvider.CreateCategory)
+			admin.PUT("/categories/:id", provider.CategoryProvider.UpdateCategory)
+			admin.DELETE("/categories/:id", provider.CategoryProvider.DeleteCategory)
+			admin.POST("/categories/books", provider.CategoryProvider.AddBookCategory)
 		}
 	}
 
@@ -53,29 +52,6 @@ func CORS() gin.HandlerFunc {
 		if ctx.Request.Method == "OPTIONS" {
 			ctx.AbortWithStatus(http.StatusNoContent)
 		}
-		ctx.Next()
-	}
-}
-
-func CheckAuth() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		header := ctx.GetHeader("Authorization")
-
-		bearerToken := strings.Split(header, "Bearer ")
-
-		if len(bearerToken) != 2 {
-			resp := response.UnauthorizedErrorWithAdditionalInfo("len token must be 2")
-			ctx.AbortWithStatusJSON(resp.StatusCode, resp)
-			return
-		}
-
-		payload, err := token.ValidateToken(bearerToken[1])
-		if err != nil {
-			resp := response.UnauthorizedErrorWithAdditionalInfo(err.Error())
-			ctx.AbortWithStatusJSON(resp.StatusCode, resp)
-			return
-		}
-		ctx.Set("authId", payload.AuthId)
 		ctx.Next()
 	}
 }

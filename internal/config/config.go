@@ -11,6 +11,7 @@ type Config struct {
 	DBName         string `mapstructure:"DB_DATABASE"`
 	DBPort         string `mapstructure:"DB_PORT"`
 	ServerPort     string `mapstructure:"PORT"`
+	UserGRPC       string `mapstructure:"USER_GRCP"`
 }
 
 var ENV *Config

@@ -1,0 +1,12 @@
+CREATE TABLE borrows (
+    id SERIAL PRIMARY KEY NOT NULL,
+    user_id INT NOT NULL,  
+    book_id INT NOT NULL,  
+    borrowed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    returned_at TIMESTAMP,
+    status VARCHAR(20) CHECK (status IN ('borrowed', 'returned')) NOT NULL DEFAULT 'borrowed',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+);

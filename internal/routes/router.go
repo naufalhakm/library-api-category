@@ -30,7 +30,7 @@ func RegisterRoutes(provider *factory.Provider, authClient *client.AuthClient) *
 			auth := v1.Use(middleware.CheckAuth(authClient))
 			auth.GET("/categories", provider.CategoryProvider.GetAllCategories)
 			auth.GET("/categories/:id", provider.CategoryProvider.GetDetailCategory)
-			auth.GET("/books/:id", provider.CategoryProvider.ListCategoryOfBook)
+			auth.GET("/categories/books/:id", provider.CategoryProvider.ListCategoryOfBook)
 
 			admin := v1.Use(middleware.CheckAuthIsAdminOrAuthor(authClient))
 			admin.POST("/categories", provider.CategoryProvider.CreateCategory)

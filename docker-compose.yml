@@ -1,17 +1,16 @@
 version: "3.8"
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    restart: unless-stopped
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: library
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
-volumes:
-  postgres_data:
+  goservices:
+    build: "."
+    container_name: goservices
+    image: naufalhakm/library-api-category:v1
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: user
+      DB_PASSWORD: password
+      DB_DATABASE: library
+    ports:
+      - "8084:8084"  # REST API
+    restart: always

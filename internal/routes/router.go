@@ -18,7 +18,7 @@ func RegisterRoutes(provider *factory.Provider, authClient *client.AuthClient) *
 
 	router.GET("/", func(ctx *gin.Context) {
 		currentYear := time.Now().Year()
-		message := fmt.Sprintf("Library API Book %d", currentYear)
+		message := fmt.Sprintf("Library API Category %d", currentYear)
 
 		ctx.JSON(http.StatusOK, message)
 	})

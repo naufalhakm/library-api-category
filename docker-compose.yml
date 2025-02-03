@@ -4,7 +4,7 @@ services:
   goservices-category:
     build: "."
     container_name: goservices-category
-    image: naufalhakm/library-api-category:v2
+    image: naufalhakm/library-api-category:v3
     environment:
       DB_HOST: postgres
       DB_PORT: 5432

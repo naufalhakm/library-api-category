@@ -11,6 +11,8 @@ services:
       DB_USERNAME: user
       DB_PASSWORD: password
       DB_DATABASE: library
+    volumes:
+      - .env:/app/.env
     ports:
       - "8084:8084"  # REST API
     restart: always
